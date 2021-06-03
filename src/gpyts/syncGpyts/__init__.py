@@ -12,28 +12,34 @@ class Gpyts():
 	"""Gpyts is a library for Google translation and gTTS using Google Translation API.
 
 	"""
-	def __init__(self, endpoint: Union[str, List[str]] = None, client: str = None, labled: bool = True, proxy: str = None) -> None:
+	def __init__(self,  tld: Union[str, List[str]] = None, endpoint: Union[str, List[str]] = None, client: str = None, labled: bool = True, proxy: str = None) -> None:
 		"""Configuration for Service Url and Client.
 		
 		Note:
-			Provide endpoint, client only if you know valid combination of values.
-
+			Provide tld, endpoint, client only if you know valid combination of values.
+			
+			Example of tld(s):
+				co.uk, tl
 			Example of endpoint(s):
 				translate.google.com, client0.google.com, translate.googleapis.com
 			Example of client(s):
-				gtx, t, dict-chrome-ex
+				gtx, t
+
+			Either use `tld` or `endpoint`, it wont work together. Just `tld` is required for most part even thats optional too.
 		
 		Args:
+			tld (str | List[str], Optional): Custom tld's you can provide like `com` or `co.uk`.
 			endpoint (str | List[str], Optional): Custom endpoint url to be used (random choosed if multiple provided) than default `endpoint`.
-			client (str, Optional): Custom client to be used than default `client`.
+			client (str, Optional) : Custom client to be used than default `client`.
 			labled (bool, Optional): Method return either labled or indexed json to be used than default `method`.
-			proxy (str, optional): Proxy to be used like `http://user:pass@ip:port`.
+			proxy (str, optional)  : Proxy to be used like `http://user:pass@ip:port`.
 
 		"""
 		self.__ioses  = None
-		self.endpoint = endpoint or config.endpoint
+		self.__tld    = tld or ''
+		self.endpoint = config.tdlpoint if tld else endpoint or config.endpoint
 		self.client   = client or config.client
-		self.__method   = config.method[labled]
+		self.__method = config.method[labled]
 		self.proxy    = {re.match(r'^(http|https)://',proxy).group(1) : proxy} if proxy and re.match(r'^(http|https)://',proxy) else None
 
 	def translate(self, text: str, to_lang: str, from_lang: str = 'auto', i_enc: str = 'UTF-8', o_enc: str = 'UTF-8', web: bool = False) -> Translation:
@@ -68,8 +74,9 @@ class Gpyts():
 			'sp' : 'pbmt',
 			'client' : self.client
 		}
-		result = self.__request('https://{endpoint}/{method}'.format(
-				endpoint = random.choice(self.endpoint) if type(self.endpoint) == list else self.endpoint, 
+		result = self.__request('https://{endpoint}{tld}/{method}'.format(
+				endpoint = random.choice(self.endpoint) if type(self.endpoint) == list else self.endpoint,
+				tld = random.choice(self.__tld) if type(self.__tld) == list else self.__tld,
 				method   = 'm' if web else '%s_a/%s' % (config.key[1], self.__method)
 			),
 			var   = self.__isvalid(cfgvar), 
@@ -107,8 +114,9 @@ class Gpyts():
 			'total' : 1,
             'idx': 0,
 		}
-		result = self.__request('https://{endpoint}/{method}'.format(
-				endpoint = random.choice(self.endpoint) if type(self.endpoint) == list else self.endpoint, 
+		result = self.__request('https://{endpoint}{tld}/{method}'.format(
+				endpoint = random.choice(self.endpoint) if type(self.endpoint) == list else self.endpoint,
+				tld = random.choice(self.__tld) if type(self.__tld) == list else self.__tld,
 				method   = '%s_tts' % config.key[1],
 			),
 			var   = self.__isvalid(cfgvar), 
@@ -116,8 +124,17 @@ class Gpyts():
 			full  = True
 		)
 
-		return TextToSpeech({'lang' : lang, 'text' : text, 'file' : self._savetts(download, result.content) or result.url})
+		return TextToSpeech({'lang' : lang, 'text' : text, 'file' : self.__savetts(download, result.content) or result.url})
 	
+	def iso(self) -> dict:
+		"""Lists all supported iso langauge codes for both google translate (gts) and text2speech (tts).
+		
+		Returns:
+			langs (dict of list[str]) : Having both `gts` and `tts`.
+		
+		"""
+		return {'gts' : config.supported_gts_lang.values(), 'tts' : config.supported_tts_lang}
+
 	def __isvalid(self, var: dict) -> dict:
 		"""Validates var
 		

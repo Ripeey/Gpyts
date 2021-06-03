@@ -38,6 +38,24 @@ from gpyts.syncGpyts import Gpyts
 ```
 and remove await(s), thats it!
 
+## `Gpyts`
+There are various configurations available _(all Optional)_
+* **tld**  - Custom tld's you can provide like `com` or `co.uk` or a list ['tl', 'com']. (Random choosed if `list` provided).
+* **proxy** - Proxy to be used like `http://user:pass@ip:port`.
+* **endpoint** - Custom endpoint url to be used. (Random choosed if `list` provided).
+* **client** - Custom client to be used.
+* **labled** - Custom return method to be used than default `True`.
+
+```python
+gpyts = Gpyts(tdl = ['tl', 'co.uk'], proxy = 'http://user:pass@ip:port')
+```
+
+_**Note :**
+    Provide `endpoint`, `client` only if you know valid combination of values. Either use `tld` or `endpoint`, it wont work together. Just `tld` and `proxy` is required for most part even that is Optional too._
+
+
+
+
 ## `Gpyts.`translate
 Parameters that could be passed
 * **text** - Text to be translated.
@@ -108,6 +126,14 @@ Result `TextToSpeech` object may contain attributes
 * **text** - Provided original text.
 * **file** - File path where it was saved or BytesIO buffer.
 
+##  `Gpyts.`iso
+Return lists of language iso code for both `gts` and `tts`.
+
+```python
+lang = await gpyts.iso()
+print('All supported transaltion iso code ', ' '.join(lang['gts']))
+print('All supported text2speech iso code ', ' '.join(lang['tts']))
+```
 
 ## License
 [MIT](https://github.com/Ripeey/Gpyts/blob/main/LICENSE)
