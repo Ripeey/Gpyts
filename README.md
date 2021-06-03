@@ -28,7 +28,7 @@ print("Text is : " + translation.text)
 
 # Convert Text to Speech.
 speech = await gpyts.tts("Fine, What about you?", lang = 'fr', slow = True, download = 'tts.mp3')
-print("Saved as :" + speech.path)
+print("Saved as :" + speech.file)
 ```
 
 ## Usage Sync
@@ -47,7 +47,7 @@ There are various configurations available _(all Optional)_
 * **labled** - Custom return method to be used than default `True`.
 
 ```python
-gpyts = Gpyts(tdl = ['tl', 'co.uk'], proxy = 'http://user:pass@ip:port')
+gpyts = Gpyts(tld = ['tl', 'co.uk'], proxy = 'http://user:pass@ip:port')
 ```
 
 _**Note :**
