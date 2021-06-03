@@ -81,15 +81,15 @@ Convert given text to speech
 ```python
 # Same folder as default text2speech.mp3
 text2speech = await gpyts.tts("hey, how are you?", lang = 'ja')
-print("Saved as : " + translation.path) 
+print("Saved as : " + translation.file) 
 
 # Different folder (creates if not exists) as default text2speech.mp3
 text2speech = await gpyts.tts("hey, how are you?", lang = 'ja', download = './saves/tts/')
-print("Saved as : " + translation.path) 
+print("Saved as : " + translation.file) 
 
 # Custom name
 text2speech = await gpyts.tts("hey, how are you?", lang = 'ja', download = './tts.mp3')
-print("Saved as : " + translation.path)
+print("Saved as : " + translation.file)
 ```
 You can also provide a `BytesIO` buffer object
 
