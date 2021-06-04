@@ -149,9 +149,7 @@ class Gpyts():
 			raise errors.InvalidLanguage("Unlisted target language code given. tts")
 		if var.get('tl') and var['tl'] not in config.supported_gts_lang.values(): 
 			raise errors.InvalidLanguage("Unlisted target language code given. gts")
-		if var.get('sl') and var['sl'] not in config.supported_gts_lang.values() and var['sl'] != 'auto': 
-			print(var['sl'] not in config.supported_gts_lang.values())
-			print(var['sl'] != 'auto')
+		if var.get('sl') and var['sl'] not in config.supported_gts_lang.values() and var['sl'] != 'auto':
 			raise errors.InvalidLanguage("Unlisted source language code given. gts")
 
 		return var
