@@ -2,7 +2,7 @@
 #Copyright (c) 2021 Ripe
 
 from typing import Union
-
+import json
 class Translation():
 	"""A Result class for post `translation`.
 
@@ -42,16 +42,25 @@ class Translation():
 		
 		else:
 			self.src = result.get('src')
-			try: self.text = result['sentences'][0]['trans']
+			try: 
+				if result.get('alternative_translations', []):
+					self.text = ''.join([sentence['alternative'][-1]['word_postproc'] for sentence in result['alternative_translations']]) or None
+				else:
+					self.text = ''.join([sentence['trans'] for sentence in result['sentences']]) or None
 			except (KeyError, IndexError): pass
-			try: self.origin = result['sentences'][0]['orig']
+			try: self.origin = ''.join([sentence['orig'] for sentence in result['sentences']]) or None
 			except (KeyError, IndexError): pass
-			try: self.translit = result['sentences'][1]['src_translit']
+			try: self.translit = result['sentences'][-1].get('src_translit',None) or result['sentences'][-1].get('translit',None)
 			except (KeyError, IndexError): pass
 			try: self.confidence = result['confidence']
 			except (KeyError, IndexError): pass
 			try:
-				for phrase in result['alternative_translations'][0]['alternative']: self.alternative.append(phrase['word_postproc'])
+				if result.get('alternative_translations', []):
+					for _ in range(len(result['alternative_translations'][0]['alternative'])-1):
+						text = ''
+						for sentence in result['alternative_translations']:
+							text += sentence['alternative'][_]['word_postproc']
+						if text: self.alternative.append(text)
 			except (KeyError, IndexError): pass
 
 class TextToSpeech():
