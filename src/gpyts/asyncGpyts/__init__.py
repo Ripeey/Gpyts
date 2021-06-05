@@ -3,7 +3,7 @@
 #MIT License
 #Copyright (c) 2021 Ripe
 
-import aiohttp, aiofiles, asyncio, random, json, os, io, re
+import asyncio, aiohttp, aiofiles, asyncio, random, json, os, io, re
 from .. import config, errors
 from typing import Union, List
 from .. types import Translation, TextToSpeech
@@ -201,18 +201,24 @@ class Gpyts():
 			var (dict): Configuration arguemnts for translator.
 		
 		"""
+		self.__aioses = self.__aioses or aiohttp.ClientSession(headers = config.headers)
+		async with self.__aioses.get(url, params = var, proxy = proxy) as response:
+			if response.status == 200:
+				response._content = await response.read()
+				return response if full else response._content
+			
+			elif response.status in [404, 403, 408, 504]:
+				raise errors.ConfigError('Invalid endpoint url or client given.')
+			
+			elif response.status in [429, 503]:
+				raise errors.FloodError('Too many requests please try later.')
+			
+			else:
+				raise response.raise_for_status()
 
-		async with self.__aioses or aiohttp.ClientSession(headers = config.headers) as self.__aioses:
-			async with self.__aioses.get(url, params = var, proxy = proxy) as response:
-				if response.status == 200:
-					response._content = await response.read()
-					return response if full else response._content
-				
-				elif response.status in [404, 403, 408, 504]:
-					raise errors.ConfigError('Invalid endpoint url or client given.')
-				
-				elif response.status in [429, 503]:
-					raise errors.FloodError('Too many requests please try later.')
-				
-				else:
-					raise response.raise_for_status()
+	def __del__(self):
+		loop = asyncio.get_event_loop()
+		if loop.is_running():
+			loop.create_task(self.__aioses.close())
+		else:
+			loop.run_until_complete(self.__aioses.close())
