@@ -125,14 +125,14 @@ class Gpyts():
 
 		return TextToSpeech({'lang' : lang, 'text' : text, 'file' : await self.__savetts(download, result._content) or result.url})
 	
-	async def iso(self) -> dict:
+	async def iso(self, full: bool = False) -> dict:
 		"""Lists all supported iso langauge codes for both google translate (gts) and text2speech (tts).
 		
 		Returns:
 			langs (dict of list[str]) : Having both `gts` and `tts`.
 		
 		"""
-		return {'gts' : config.supported_gts_lang.values(), 'tts' : config.supported_tts_lang}
+		return {'gts' : config.supported_gts_lang if full else config.supported_gts_lang.values(), 'tts' : config.supported_tts_lang}
 
 	async def __isvalid(self, var: dict) -> dict:
 		"""Validates var
