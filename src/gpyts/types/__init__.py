@@ -29,15 +29,27 @@ class Translation():
 		"""result (dict): Json decoded dict from google translation `result`."""
 		if type(result) == list:
 			self.src = result[2]
-			try: self.text = result[0][0][0]
+			try: 
+				if result[5]:
+					self.text = ''.join([sentence[2][-1][0] for sentence in result[5]]) or None
+				else:
+					self.text = ''.join([(sentence[0] or '') for sentence in result[0]]) or None
 			except IndexError: pass
-			try: self.origin = result[0][0][1]
+			try: self.origin = ''.join([(sentence[1] or '') for sentence in result[0]]) or None
 			except IndexError: pass
-			try: self.translit = result[0][1][3]
+			try: self.translit = result[0][-1][3]
 			except IndexError: pass
 			self.confidence = result[6]
 			try: 
-				for pharse in result[5][0][2]: self.alternative.append(pharse[0])
+				if result[5]:
+					for _ in range(len(result[5][0][2])-1):
+						text = ''
+						for sentence in result[5]:
+							try:
+								text += sentence[2][_][0]
+							except IndexError:
+								text += sentence[2][0][0]
+						if text: self.alternative.append(text)
 			except IndexError: pass
 		
 		else:
@@ -46,9 +58,9 @@ class Translation():
 				if result.get('alternative_translations', []):
 					self.text = ''.join([sentence['alternative'][-1]['word_postproc'] for sentence in result['alternative_translations']]) or None
 				else:
-					self.text = ''.join([sentence['trans'] for sentence in result['sentences']]) or None
+					self.text = ''.join([sentence.get('trans','') for sentence in result['sentences']]) or None
 			except (KeyError, IndexError): pass
-			try: self.origin = ''.join([sentence['orig'] for sentence in result['sentences']]) or None
+			try: self.origin = ''.join([sentence.get('orig','') for sentence in result['sentences']]) or None
 			except (KeyError, IndexError): pass
 			try: self.translit = result['sentences'][-1].get('src_translit',None) or result['sentences'][-1].get('translit',None)
 			except (KeyError, IndexError): pass
@@ -59,7 +71,10 @@ class Translation():
 					for _ in range(len(result['alternative_translations'][0]['alternative'])-1):
 						text = ''
 						for sentence in result['alternative_translations']:
-							text += sentence['alternative'][_]['word_postproc']
+							try:
+								text += sentence['alternative'][_]['word_postproc']
+							except (KeyError, IndexError):
+								text += sentence['alternative'][0]['word_postproc']
 						if text: self.alternative.append(text)
 			except (KeyError, IndexError): pass
 
