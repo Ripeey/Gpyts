@@ -12,7 +12,7 @@ Gpyts is a library for Google translation and gTTS using Google Translation (API
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install Gpyts.
 
 ```bash
-pip install https://github.com/Ripeey/Gpyts/archive/refs/heads/main.zip
+pip install Gpyts
 ```
 
 ## Usage Async
