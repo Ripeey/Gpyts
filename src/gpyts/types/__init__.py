@@ -31,7 +31,7 @@ class Translation():
 			self.src = result[2]
 			try: 
 				if result[5]:
-					self.text = ''.join([sentence[2][-1][0] for sentence in result[5]]) or None
+					self.text = ''.join([(sentence[2][-1][0] if sentence[2] else sentence[0]) for sentence in result[5]]) or None
 				else:
 					self.text = ''.join([(sentence[0] or '') for sentence in result[0]]) or None
 			except IndexError: pass
@@ -46,9 +46,9 @@ class Translation():
 						text = ''
 						for sentence in result[5]:
 							try:
-								text += sentence[2][_][0]
+								text += sentence[2][_][0] if sentence[2] else sentence[0]
 							except IndexError:
-								text += sentence[2][0][0]
+								text += sentence[2][0][0] if sentence[2] else sentence[0]
 						if text: self.alternative.append(text)
 			except IndexError: pass
 		
@@ -56,7 +56,10 @@ class Translation():
 			self.src = result.get('src')
 			try: 
 				if result.get('alternative_translations', []):
-					self.text = ''.join([sentence['alternative'][-1]['word_postproc'] for sentence in result['alternative_translations']]) or None
+					text = ''
+					for sentence in result['alternative_translations']:
+						text += sentence['alternative'][-1]['word_postproc'] if sentence.get('alternative') else sentence['src_phrase']
+					self.text = text or None
 				else:
 					self.text = ''.join([sentence.get('trans','') for sentence in result['sentences']]) or None
 			except (KeyError, IndexError): pass
@@ -71,10 +74,13 @@ class Translation():
 					for _ in range(len(result['alternative_translations'][0]['alternative'])-1):
 						text = ''
 						for sentence in result['alternative_translations']:
-							try:
-								text += sentence['alternative'][_]['word_postproc']
-							except (KeyError, IndexError):
-								text += sentence['alternative'][0]['word_postproc']
+							if sentence.get('alternative'):
+								try:
+									text += sentence['alternative'][_]['word_postproc']
+								except (KeyError, IndexError):
+									text += sentence['alternative'][0]['word_postproc']
+							else:
+								text += sentence['src_phrase']
 						if text: self.alternative.append(text)
 			except (KeyError, IndexError): pass
 
