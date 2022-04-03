@@ -44,6 +44,7 @@ There are various configurations available _(all Optional)_
 * **proxy** - Proxy to be used like `http://user:pass@ip:port`.
 * **endpoint** - Custom endpoint url to be used. (Random choosed if `list` provided).
 * **client** - Custom client to be used.
+* **minimal** - Make result simply a translated `text`, default `False`.
 * **labled** - Custom return method to be used than default `True`.
 
 ```python

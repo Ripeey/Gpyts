@@ -28,29 +28,32 @@ class Translation():
 	def __init__(self, result : Union[list, dict]) -> None:
 		"""result (dict): Json decoded dict from google translation `result`."""
 		if type(result) == list:
-			self.src = result[2]
-			try: 
-				if result[5]:
-					self.text = ''.join([(sentence[2][-1][0] if sentence[2] else sentence[0]) for sentence in result[5]]) or None
-				else:
-					self.text = ''.join([(sentence[0] or '') for sentence in result[0]]) or None
-			except IndexError: pass
-			try: self.origin = ''.join([(sentence[1] or '') for sentence in result[0]]) or None
-			except IndexError: pass
-			try: self.translit = result[0][-1][3]
-			except IndexError: pass
-			self.confidence = result[6]
-			try: 
-				if result[5]:
-					for _ in range(len(result[5][0][2])-1):
-						text = ''
-						for sentence in result[5]:
-							try:
-								text += sentence[2][_][0] if sentence[2] else sentence[0]
-							except IndexError:
-								text += sentence[2][0][0] if sentence[2] else sentence[0]
-						if text: self.alternative.append(text)
-			except IndexError: pass
+			if len(result) == 1:
+				self.text = result[0]
+			else:
+				self.src = result[2]
+				try: 
+					if result[5]:
+						self.text = ''.join([(sentence[2][-1][0] if sentence[2] else sentence[0]) for sentence in result[5]]) or None
+					else:
+						self.text = ''.join([(sentence[0] or '') for sentence in result[0]]) or None
+				except IndexError: pass
+				try: self.origin = ''.join([(sentence[1] or '') for sentence in result[0]]) or None
+				except IndexError: pass
+				try: self.translit = result[0][-1][3]
+				except IndexError: pass
+				self.confidence = result[6]
+				try: 
+					if result[5]:
+						for _ in range(len(result[5][0][2])-1):
+							text = ''
+							for sentence in result[5]:
+								try:
+									text += sentence[2][_][0] if sentence[2] else sentence[0]
+								except IndexError:
+									text += sentence[2][0][0] if sentence[2] else sentence[0]
+							if text: self.alternative.append(text)
+				except IndexError: pass
 		
 		else:
 			self.src = result.get('src')

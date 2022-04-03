@@ -12,7 +12,7 @@ class Gpyts():
 	"""Gpyts is a library for Google translation and gTTS using Google Translation API.
 
 	"""
-	def __init__(self, tld: Union[str, List[str]] = None, endpoint: Union[str, List[str]] = None, client: str = None, labled: bool = True, proxy: str = None) -> None:
+	def __init__(self, tld: Union[str, List[str]] = None, endpoint: Union[str, List[str]] = None, client: str = None, minimal: bool = False, labled: bool = True, proxy: str = None) -> None:
 		"""Configuration for Service Url and Client.
 		
 		Note:
@@ -23,7 +23,7 @@ class Gpyts():
 			Example of endpoint(s):
 				translate.google.com, client0.google.com, translate.googleapis.com
 			Example of client(s):
-				gtx, t
+				gtx, t, dict-chrome-ex, webapp (needs `tk` token)
 
 			Either use `tld` or `endpoint`, it wont work together. Just `tld` is required for most part even thats optional too.
 		
@@ -31,7 +31,8 @@ class Gpyts():
 			tld (str | List[str], Optional): Custom tld's you can provide like `com` or `co.uk`.
 			endpoint (str | List[str], Optional): Custom endpoint url to be used (random choosed if multiple provided) than default `endpoint`.
 			client (str, Optional): Custom client to be used than default `client`.
-			labled (bool, Optional): Method return either labled or indexed json to be used than default `method`.
+			minimal (bool, Optional): Result is simple, just a translation.
+			labled (bool, Optional): Method return either labled or indexed json to be used.
 			proxy (str, optional): Proxy to be used like `http://user:pass@ip:port`.
 
 		"""
@@ -39,7 +40,8 @@ class Gpyts():
 		self.__tld    = tld or ''
 		self.endpoint = config.tdlpoint if tld else endpoint or config.endpoint
 		self.client   = client or config.client
-		self.__method = config.method[int(labled)]
+		self.__method = config.method[int(minimal)]
+		self.__labled = int(labled)
 		self.proxy    = proxy if proxy and re.match(r'^(http|https)://',proxy) else None
 
 	async def translate(self, text: str, to_lang: str, from_lang: str = 'auto', i_enc: str = 'UTF-8', o_enc: str = 'UTF-8', web: bool = False) -> Translation:
@@ -72,6 +74,7 @@ class Gpyts():
 			'ie' : i_enc,
 			'oe' : o_enc,
 			'sp' : 'pbmt',
+			'dj' : self.__labled,
 			'client' : self.client
 		}
 		result = await self.__request('https://{endpoint}{tld}/{method}'.format(
@@ -218,6 +221,7 @@ class Gpyts():
 
 	def __del__(self):
 		loop = asyncio.get_event_loop()
+
 		if loop.is_running():
 			loop.create_task(self.__aioses.close())
 		else:

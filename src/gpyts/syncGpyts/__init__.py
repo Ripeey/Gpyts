@@ -12,7 +12,7 @@ class Gpyts():
 	"""Gpyts is a library for Google translation and gTTS using Google Translation API.
 
 	"""
-	def __init__(self,  tld: Union[str, List[str]] = None, endpoint: Union[str, List[str]] = None, client: str = None, labled: bool = True, proxy: str = None) -> None:
+	def __init__(self,  tld: Union[str, List[str]] = None, endpoint: Union[str, List[str]] = None, client: str = None, minimal: bool = False, labled: bool = True, proxy: str = None) -> None:
 		"""Configuration for Service Url and Client.
 		
 		Note:
@@ -39,7 +39,8 @@ class Gpyts():
 		self.__tld    = tld or ''
 		self.endpoint = config.tdlpoint if tld else endpoint or config.endpoint
 		self.client   = client or config.client
-		self.__method = config.method[labled]
+		self.__method = config.method[int(minimal)]
+		self.__labled = int(labled)
 		self.proxy    = {re.match(r'^(http|https)://',proxy).group(1) : proxy} if proxy and re.match(r'^(http|https)://',proxy) else None
 
 	def translate(self, text: str, to_lang: str, from_lang: str = 'auto', i_enc: str = 'UTF-8', o_enc: str = 'UTF-8', web: bool = False) -> Translation:
@@ -72,6 +73,7 @@ class Gpyts():
 			'ie' : i_enc,
 			'oe' : o_enc,
 			'sp' : 'pbmt',
+			'dj' : self.__labled,
 			'client' : self.client
 		}
 		result = self.__request('https://{endpoint}{tld}/{method}'.format(
