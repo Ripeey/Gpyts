@@ -220,9 +220,10 @@ class Gpyts():
 				raise response.raise_for_status()
 
 	def __del__(self):
-		loop = asyncio.get_event_loop()
+		if self.__aioses:
+			loop = asyncio.get_event_loop()
 
-		if loop.is_running():
-			loop.create_task(self.__aioses.close())
-		else:
-			loop.run_until_complete(self.__aioses.close())
+			if loop.is_running():
+				loop.create_task(self.__aioses.close())
+			else:
+				loop.run_until_complete(self.__aioses.close())
