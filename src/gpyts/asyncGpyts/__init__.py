@@ -221,7 +221,10 @@ class Gpyts():
 
 	def __del__(self):
 		if self.__aioses:
-			loop = asyncio.get_event_loop()
+			try:
+				loop = asyncio.get_event_loop()
+			except RuntimeError:
+				loop = asyncio.new_event_loop()
 
 			if loop.is_running():
 				loop.create_task(self.__aioses.close())
