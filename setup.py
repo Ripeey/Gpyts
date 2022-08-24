@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
 	name='Gpyts',
-	version='1.0.2',
+	version='1.0.3',
 	description='Gpyts is a library for Google translation and gTTS using Google Translation API.',
 	long_description=long_description,
     long_description_content_type="text/markdown",
